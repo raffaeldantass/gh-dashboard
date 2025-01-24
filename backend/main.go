@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	// Serve static files from the 'public' directory
-	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
 
 	// Simple API endpoint
