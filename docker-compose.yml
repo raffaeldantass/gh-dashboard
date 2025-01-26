@@ -1,21 +1,47 @@
 services:
-  backend:
-    build: 
+  backend-dev:
+    build:
       context: ./backend
-      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./backend/:/app
     ports:
       - "8080:8080"
     environment:
-      GITHUB_APP_ID: ${GITHUB_APP_ID}
-      GITHUB_PRIVATE_KEY: ${GITHUB_PRIVATE_KEY}
-      GITHUB_ORGANIZATIONS: ${GITHUB_ORGANIZATIONS}
-      GITHUB_PERSONAL_ACCOUNTS: ${GITHUB_PERSONAL_ACCOUNTS}
+      - GO_ENV=development
 
-  frontend:
-    build: 
+  backend-prod:
+    build:
+      context: ./backend
+      target: prod
+    ports:
+      - "8080:8080"
+    environment:
+      - GO_ENV=production
+  
+  frontend-dev:
+    build:
       context: ./frontend
-      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./frontend:/app
+      # Exclude node_modules and .next
+      - /app/node_modules
+      - /app/.next
     ports:
       - "3000:3000"
+    env_file:
+      - .env.development
     environment:
-      NEXT_PUBLIC_API_BASE_URL: http://backend:8080
+      - NODE_ENV=development
+
+  frontend-prod:
+    build:
+      context: ./frontend
+      target: prod
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
