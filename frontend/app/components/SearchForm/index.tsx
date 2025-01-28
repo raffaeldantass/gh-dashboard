@@ -1,4 +1,3 @@
-// components/SearchForm/SearchForm.tsx
 import React from 'react';
 import type { SearchFilters } from '@/app/types/github';
 

@@ -1,5 +1,3 @@
-// types/github.ts
-
 export interface Repository {
   id: number;
   name: string;

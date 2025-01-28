@@ -1,5 +1,3 @@
-// app/lib/hooks/useGithubRepos.ts
-
 import { useState } from 'react';
 import { handleSearch } from '@/app/lib/handleSearch';
 import type { Repository, SearchFilters, UseGithubReposReturn } from '@/app/types/github';
