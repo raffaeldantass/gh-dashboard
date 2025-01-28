@@ -3,6 +3,7 @@ import type { Repository, SearchFilters } from '@/app/types/github';
 interface SearchResponse {
   data: Repository[] | null;
   error: string | null;
+  total_pages?: number;
 }
 
 export async function handleSearch(filters: SearchFilters): Promise<SearchResponse> {
