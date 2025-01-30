@@ -1,6 +1,8 @@
 .idea
 .git
 .gitignore
+**/.env.development
+**/.env.production
 .env.development
 .env.production
 *.md
@@ -13,6 +15,7 @@ yarn-debug.log
 **/build
 **/.next
 **/.nuxt
+**/private_key.pem
 
 .vscode
 .idea
