@@ -36,7 +36,6 @@ export function useGithubRepos(): UseGithubReposReturn {
     
     if (data) {
       setRepositories(data);
-      setTotalPages(data.total_pages);
     }
 
     setIsLoading(false);

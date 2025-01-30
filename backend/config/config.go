@@ -11,6 +11,7 @@ type Config struct {
 	ClientSecret string
 	RedirectURL  string
 	OAuth2Config *oauth2.Config
+	Env          string
 }
 
 func Load() *Config {
@@ -18,6 +19,11 @@ func Load() *Config {
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 		RedirectURL:  os.Getenv("GITHUB_REDIRECT_URL"),
+		Env:          os.Getenv("APP_ENV"),
+	}
+
+	if cfg.Env == "" {
+		cfg.Env = "development"
 	}
 
 	if cfg.ClientID == "" || cfg.ClientSecret == "" || cfg.RedirectURL == "" {

@@ -9,13 +9,12 @@ import (
 )
 
 func main() {
-	// Initialize config
 	cfg := config.Load()
+	if cfg.Env == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
-	// Setup router
 	router := gin.Default()
-
-	// Routes
 	router.GET("/login", handlers.HandleLogin(cfg))
 	router.GET("/callback", handlers.HandleCallback(cfg))
 	router.GET("/repositories", middleware.AuthenticateToken(), handlers.GetRepositories())
