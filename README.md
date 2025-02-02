@@ -124,7 +124,7 @@ Go to the frontend folder and run the following command to install the dependenc
 $ ~/gh-dashboard/frontend npm install
 ```
 
-Go to the backend folder and run the following command to update and install the dependencies **This is not required, it's optional and the goal is to make update the packages if necessary**:
+Go to the backend folder and run the following command to update and install the dependencies **This is not required, it's optional and the goal is to make it easier to update the packages if necessary**:
 
 ```
 $ ~/gh-dashboard/backend go mod tidy
