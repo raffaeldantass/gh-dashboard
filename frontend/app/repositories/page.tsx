@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useGithubRepos } from '@/app/lib/hooks/useGithubRepos';
 import ResultList from '@/app/components/ResultList';
+import Loading from '@/app/components/Loading';
 import { TokenManager } from '@/app/lib/utils';
 
-// Components
 const AuthenticationRequired = () => (
   <div className="flex flex-col justify-center items-center h-screen space-y-4">
     <h2 className="text-xl font-semibold text-gray-800">Authentication Required</h2>
@@ -35,8 +35,7 @@ const PageHeader = ({ onLogout }: { onLogout: () => void }) => (
   </div>
 );
 
-// Main Page Component
-export default function RepositoriesPage() {
+function RepositoriesContent() {
   const searchParams = useSearchParams();
   const { 
     repositories,
@@ -49,14 +48,11 @@ export default function RepositoriesPage() {
     fetchRepositories
   } = useGithubRepos();
 
-  // Check authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Move authentication check to useEffect
     setIsAuthenticated(TokenManager.get() !== null);
 
-    // Handle token from URL
     const token = searchParams.get('token');
     if (token) {
       TokenManager.set(token);
@@ -88,5 +84,13 @@ export default function RepositoriesPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function RepositoriesPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <RepositoriesContent />
+    </Suspense>
   );
 }
