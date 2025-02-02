@@ -1,58 +1,74 @@
-import { useState } from 'react';
-import { handleSearch } from '@/app/lib/handleSearch';
-import type { Repository, SearchFilters, UseGithubReposReturn } from '@/app/types/github';
-
-const PER_PAGE = 10;
+import { useState, useEffect } from 'react';
+import { fetchApi } from '@/app/lib/api';
+import { TokenManager } from '@/app/lib/utils';
+import type { 
+  Repository, 
+  UseGithubReposReturn, 
+  PaginatedResponse 
+} from '@/app/types/github';
+import { useRouter } from 'next/navigation';
 
 export function useGithubRepos(): UseGithubReposReturn {
+  const router = useRouter();
+  
+  // State management
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [currentFilters, setCurrentFilters] = useState<Omit<SearchFilters, 'page' | 'per_page'>>({
-    query: '',
-    organization: undefined
-  });
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchRepositories = async (
-    filters: Omit<SearchFilters, 'page' | 'per_page'>, 
-    page: number
-  ) => {
+  // Initial load
+  useEffect(() => {
+    const token = TokenManager.get();
+    if (token) {
+      TokenManager.set(token);
+      fetchRepositories(1);
+    }
+  }, []);
+
+  // API interaction
+  const fetchRepositories = async (page: number): Promise<void> => {
     setIsLoading(true);
     setError(null);
-
-    const { data, error: searchError } = await handleSearch({
-      ...filters,
-      page,
-      per_page: PER_PAGE
-    });
     
-    if (searchError) {
-      setError(searchError);
-      setRepositories([]);
-      setTotalPages(0);
-    }
-    
-    if (data) {
-      setRepositories(data);
-    }
+    try {
+      const token = TokenManager.get();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
 
+      const response = await fetchApi(`/get-repositories?page=${page}&per_page=10`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = response as PaginatedResponse;
+      setRepositories(data?.repositories ?? []);
+      setCurrentPage(data.current_page);
+      setTotalPages(data.total_pages);
+    } catch (err) {
+      setError('Failed to fetch repositories');
+      console.error('Error fetching repositories:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Event handlers
+  const handlePageChange = async (page: number): Promise<void> => {
+    await fetchRepositories(page);
+  };
+
+  const logout = (): void => {
+    TokenManager.clear();
+    setRepositories([]);
     setIsLoading(false);
-  };
-
-  const handleSearchSubmit = async (
-    filters: Omit<SearchFilters, 'page' | 'per_page'>
-  ) => {
+    setError(null);
     setCurrentPage(1);
-    setCurrentFilters(filters);
-    await fetchRepositories(filters, 1);
-  };
-
-  const handlePageChange = async (page: number) => {
-    setCurrentPage(page);
-    await fetchRepositories(currentFilters, page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTotalPages(1);
+    router.push('/');
   };
 
   return {
@@ -61,7 +77,8 @@ export function useGithubRepos(): UseGithubReposReturn {
     error,
     currentPage,
     totalPages,
-    handleSearchSubmit,
-    handlePageChange
+    fetchRepositories,
+    handlePageChange,
+    logout,
   };
 }

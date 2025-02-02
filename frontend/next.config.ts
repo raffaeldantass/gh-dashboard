@@ -9,6 +9,15 @@ const nextConfig = {
     }
     return config
   },
+  async rewrites() {
+    const isProduction = process.env.NODE_ENV === 'production';
+    return [
+      {
+        source: '/api/:path*',
+        destination: `http://${isProduction ? 'backend-prod' : 'backend-dev'}:8080/api/:path*`,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig

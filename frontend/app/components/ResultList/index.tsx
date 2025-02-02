@@ -1,16 +1,17 @@
 import React from 'react';
-import Image from 'next/image';
-import type { Repository } from '@/app/types/github';
 import Loading from '@/app/components/Loading';
+import Pagination from '@/app/components/Pagination';
+import { ResultListProps } from '@/app/types/github'
 
-interface ResultListProps {
-  repositories: Repository[];
-  isLoading: boolean;
-  error?: string | null;
-}
-
-const ResultList: React.FC<ResultListProps> = ({ repositories, isLoading, error }) => {
-  if (repositories.length === 0) {
+const ResultList: React.FC<ResultListProps> = ({ 
+  repositories, 
+  isLoading, 
+  error, 
+  currentPage,
+  totalPages,
+  onPageChange 
+}) => {
+  if (repositories.length === 0 && !isLoading) {
     return (
       <>
         {error ? (
@@ -27,56 +28,52 @@ const ResultList: React.FC<ResultListProps> = ({ repositories, isLoading, error 
   }
 
   return (
-    <div className="mt-6 space-y-4">
-      {isLoading ? (
-        <>
-        <Loading />
-        <h1>Here</h1>
-        </>
-      ): (
-        <>
-          {repositories.map((repo) => (
-            <div key={repo.id} className="p-6 rounded-lg shadow-sm">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    {repo.private ? (
-                      <div className="h-4 w-4 text-amber-500" ></div>
-                    ) : (
-                      <div className="h-4 w-4 text-green-500" ></div>
+    <>
+      <div className="mt-6 space-y-4">
+        {isLoading ? (
+          <Loading />
+        ): (
+          <>
+            {repositories.map((repo) => (
+              <div key={`${repo.owner}-${repo.name}-${repo.last_update.toString()}`} className="p-6 rounded-lg shadow-sm">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">{repo.name}</h3>
+                    </div>
+                    {repo.description ? (
+                      <p className="text-sm text-gray-600">{repo.description}</p>
+                    ) : ( <p className="text-sm text-gray-600">No description provided</p> )}
+                    {repo.is_private && (
+                      <p className="text-sm text-gray-600"> Private Repo </p>
                     )}
-                    <h3 className="font-medium">{repo.name}</h3>
                   </div>
-                  {repo.description && (
-                    <p className="text-sm text-gray-600">{repo.description}</p>
-                  )}
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    {repo.organization && (
-                        <Image
-                          src={repo.organization.avatar_url}
-                          alt={repo.organization.login}
-                          width={16}
-                          height={16}
-                          className="rounded-full"
-                        />
-                    )}
-                    {repo.language && (
-                      <div className="flex items-center gap-1">
-                        <div className="h-4 w-4" ></div>
-                        <span>{repo.language}</span>
-                      </div>
-                    )}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-sm text-gray-500">
+                    Last updated: {new Date(repo.last_update).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Owner: {repo.owner}
+                    </span>
                   </div>
                 </div>
-                <span className="text-sm text-gray-500">
-                  Updated {new Date(repo.updated_at).toLocaleDateString()}
-                </span>
               </div>
-            </div>
-          ))}
-        </>
-      )}
-    </div>
+            ))}
+          </>
+        )}
+      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        isLoading={isLoading}
+      />
+    </>
   );
 };
 

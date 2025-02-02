@@ -1,11 +1,13 @@
 package main
 
 import (
+	"log"
+
+	"github.com/gin-contrib/cors" // Change this import
 	"github.com/gin-gonic/gin"
 	"github.com/raffaeldantass/gh-dashboard/config"
 	"github.com/raffaeldantass/gh-dashboard/handlers"
 	"github.com/raffaeldantass/gh-dashboard/middleware"
-	"log"
 )
 
 func main() {
@@ -15,9 +17,20 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.GET("/login", handlers.HandleLogin(cfg))
+
+	// Use Gin's CORS middleware
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{cfg.FrontendURL},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * 60 * 60, // 12 hours
+	}))
+
+	router.GET("/api/login", handlers.HandleLogin(cfg))
 	router.GET("/callback", handlers.HandleCallback(cfg))
-	router.GET("/repositories", middleware.AuthenticateToken(), handlers.GetRepositories())
+	router.GET("/api/get-repositories", middleware.AuthenticateToken(), handlers.GetRepositories())
 
 	log.Fatal(router.Run(":8080"))
 }

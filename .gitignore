@@ -5,6 +5,8 @@
 **/.env.production
 .env.development
 .env.production
+**/tmp
+tmp
 
 node_modules
 npm-debug.log

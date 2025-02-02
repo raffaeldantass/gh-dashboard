@@ -1,25 +1,34 @@
 package config
 
 import (
-	"golang.org/x/oauth2"
 	"log"
 	"os"
+
+	"golang.org/x/oauth2"
 )
 
 type Config struct {
+	AllowOrigins []string
 	ClientID     string
 	ClientSecret string
 	RedirectURL  string
+	FrontendURL  string
 	OAuth2Config *oauth2.Config
 	Env          string
 }
 
 func Load() *Config {
 	cfg := &Config{
+		FrontendURL:  os.Getenv("FRONTEND_URL"),
+		AllowOrigins: []string{"http://localhost:3000"},
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 		RedirectURL:  os.Getenv("GITHUB_REDIRECT_URL"),
 		Env:          os.Getenv("APP_ENV"),
+	}
+
+	if cfg.FrontendURL == "" {
+		cfg.FrontendURL = "http://localhost:3000" // default value
 	}
 
 	if cfg.Env == "" {

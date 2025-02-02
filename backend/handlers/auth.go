@@ -3,10 +3,12 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/gin-gonic/gin"
-	"github.com/raffaeldantass/gh-dashboard/config"
+	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/raffaeldantass/gh-dashboard/config"
 )
 
 func generateRandomState() (string, error) {
@@ -26,11 +28,15 @@ func HandleLogin(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
+		// Set cookie with proper domain and secure flags
 		c.SetCookie("oauth_state", state, 3600, "/", "", false, true)
 
 		url := cfg.OAuth2Config.AuthCodeURL(state)
-		log.Printf("Redirecting to GitHub: %s", url)
-		c.Redirect(http.StatusTemporaryRedirect, url)
+
+		// Return the URL to the frontend
+		c.JSON(http.StatusOK, gin.H{
+			"url": url,
+		})
 	}
 }
 
@@ -56,12 +62,14 @@ func HandleCallback(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
+		// Verify the state
 		savedState, err := c.Cookie("oauth_state")
 		if err != nil || savedState != returnedState {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid state parameter"})
 			return
 		}
 
+		// Exchange the code for a token
 		token, err := cfg.OAuth2Config.Exchange(c, code)
 		if err != nil {
 			log.Printf("Token exchange error: %v", err)
@@ -72,8 +80,11 @@ func HandleCallback(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
+		// Clear the state cookie and set the token cookie
 		c.SetCookie("oauth_state", "", -1, "/", "", false, true)
 		c.SetCookie("github_token", token.AccessToken, 3600, "/", "", false, true)
-		c.Redirect(http.StatusTemporaryRedirect, "/repositories")
+
+		redirectURL := fmt.Sprintf("%s/repositories?token=%s", cfg.FrontendURL, token.AccessToken)
+		c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 }
