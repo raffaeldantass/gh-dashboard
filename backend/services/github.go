@@ -3,11 +3,12 @@ package services
 import (
 	"context"
 	"fmt"
+	"log"
+	"sort"
+
 	"github.com/google/go-github/v68/github"
 	"github.com/raffaeldantass/gh-dashboard/models"
 	"golang.org/x/oauth2"
-	"log"
-	"sort"
 )
 
 type GitHubService struct {

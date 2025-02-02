@@ -18,6 +18,9 @@ func main() {
 
 	router := gin.Default()
 
+	// Trust only local network proxies
+	router.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+
 	// Use Gin's CORS middleware
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{cfg.FrontendURL},
