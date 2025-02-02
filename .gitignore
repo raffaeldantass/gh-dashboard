@@ -16,7 +16,6 @@ yarn-debug.log
 **/build
 **/.next
 **/.nuxt
-**/private_key.pem
 
 .vscode
 .idea
