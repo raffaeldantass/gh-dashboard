@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useGithubRepos } from '@/app/lib/hooks/useGithubRepos';
@@ -49,8 +49,14 @@ export default function RepositoriesPage() {
     fetchRepositories
   } = useGithubRepos();
 
-  // Handle token from URL
+  // Check authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   useEffect(() => {
+    // Move authentication check to useEffect
+    setIsAuthenticated(TokenManager.get() !== null);
+
+    // Handle token from URL
     const token = searchParams.get('token');
     if (token) {
       TokenManager.set(token);
@@ -60,9 +66,6 @@ export default function RepositoriesPage() {
       fetchRepositories(1);
     }
   }, [searchParams, fetchRepositories]);
-
-  // Check authentication state
-  const isAuthenticated = TokenManager.get() !== null;
   
   if (!isAuthenticated && !isLoading) {
     return <AuthenticationRequired />;
