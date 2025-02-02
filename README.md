@@ -134,7 +134,7 @@ Clone the repository using Github CLI:
 ```bash
 gh repo clone raffaeldantass/gh-dashboard
 ```
-**For the sake of simplicity, the env vars are stored in .env.sample files.**
+**For the sake of simplicity, the .pem file is include in this repo. Also the env vars are stored in .env.sample files.**
 
 In a real scenario, they should be stored in a secrets manager like AWS Secrets Manager or Azure Key Vault.
 
