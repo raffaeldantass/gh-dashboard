@@ -80,28 +80,6 @@ Such as login, repositories, etc.
 
 - Services are the functions that handle the comunication with the Github APP API.
 
-#### Running the backend tests
-
-To run the backend tests, you can use the following command:
-
-```
-$ ~/gh-dashboard/backend go test .
-```
-
-If you want the verbose output, you can use the following command:
-
-```
-$ ~/gh-dashboard/backend go test -v .
-```
-
-To run the tests for a specific file, you can use the following command:
-
-```
-$ ~/gh-dashboard/backend go test -v ./<folder>/<file_test>.go
-```
-
-It was added a unit test for the github service to test the integration with the Github API. 
-
 ___
 
 ### Frontend
@@ -132,7 +110,7 @@ ___
 Clone the repository using Github CLI:
 
 ```bash
-gh repo clone raffaeldantass/gh-dashboard
+gh repo clone raffaeldantass/gh-dashboard 
 ```
 **For the sake of simplicity, the .pem file is include in this repo. Also the env vars are stored in .env.sample files.**
 
@@ -140,30 +118,30 @@ In a real scenario, they should be stored in a secrets manager like AWS Secrets 
 
 Go to the project directory and create a *.env.development* and also *.env.production* file and copy the contents of *.env.sample.development* and *.env.sample.production* to it.
 
-Go to the backend folder and run the following command to install the dependencies:
-
-```
-$ ~/gh-dashboard/backend go mod tidy
-```
-
 Go to the frontend folder and run the following command to install the dependencies:
 
 ```
 $ ~/gh-dashboard/frontend npm install
 ```
 
+Go to the backend folder and run the following command to update and install the dependencies **This is not required, it's optional and the goal is to make update the packages if necessary**:
+
+```
+$ ~/gh-dashboard/backend go mod tidy
+```
+
 Open Docker Desktop and run:
 
-For Local Development:
+For Local Development (In your gh-dashboard root folder):
 
 ```
-$ ~/gh-dashboard docker compose --env-file .env.development up frontend-dev backend-dev
+docker compose --env-file .env.development up frontend-dev backend-dev
 ```
 
-For Production:
+For Production (In your gh-dashboard root folder):
 
 ```
-$ ~/gh-dashboard docker compose --env-file .env.production up frontend-dev backend-dev
+docker compose --env-file .env.production up frontend-dev backend-dev
 ```
 
 ## Usage
@@ -194,6 +172,28 @@ It's the login route. It'll redirect the user to Github's OAuth page.
 
 - **/api/repositories:**
 It's the repositories route. It's used to get the repositories of the user. It'll return a paginated list of repositories if the user is logged in.
+
+#### Running the backend tests
+
+To run the backend tests, you can use the following command:
+
+```
+$ ~/gh-dashboard/backend go test .
+```
+
+If you want the verbose output, you can use the following command:
+
+```
+$ ~/gh-dashboard/backend go test -v .
+```
+
+To run the tests for a specific file, you can use the following command:
+
+```
+$ ~/gh-dashboard/backend go test -v ./<folder>/<file_test>.go
+```
+
+It was added a unit test for the github service to test the integration with the Github API. 
 
 ## Philosophy
 
